@@ -1,0 +1,186 @@
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Open Sans', sans-serif;
+    color: #f4f4f4;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, rgba(18,35,58,.8), rgba(8,15,26,.88)), url('https://source.unsplash.com/1600x900/?weather,sky');
+    background-size: cover;
+    background-position: center;
+    transition: background-image 0.8s ease-in-out;
+    font-size: 14px;
+}
+
+.card {
+    background: rgba(7, 15, 29, 0.72);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+    border-radius: 28px;
+    width: min(95vw, 470px);
+    padding: 1.5rem;
+    margin: 1rem;
+}
+
+.card h2, .card h1, .card p {
+    margin: 0;
+}
+
+.search {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+input.search-bar {
+    flex: 1;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 999px;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    font-size: 1rem;
+    outline: none;
+    transition: 0.2s ease;
+}
+
+input.search-bar:focus {
+    border-color: rgba(165, 214, 255, 0.9);
+    background: rgba(255, 255, 255, 0.14);
+    box-shadow: 0 0 0 3px rgba(117, 178, 237, 0.15);
+}
+
+.search button {
+    width: 46px;
+    height: 46px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    border-radius: 50%;
+    background: rgba(245, 246, 252, 0.18);
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search button:hover {
+    transform: scale(1.06);
+    background: rgba(67, 156, 255, 0.32);
+    box-shadow: 0 4px 16px rgba(0, 110, 235, 0.35);
+}
+
+.location-btn {
+    width: 46px;
+    height: 46px;
+    font-size: 1.1rem;
+}
+
+.location-btn:hover {
+    transform: scale(1.06);
+    background: rgba(118, 215, 123, 0.38);
+    box-shadow: 0 4px 16px rgba(34, 205, 56, 0.34);
+}
+.weather {
+    transition: opacity 0.35s ease;
+}
+
+.weather.loading {
+    opacity: 0.65;
+}
+
+.weather.loading::after {
+    content: "Loading...";
+    display: block;
+    margin-top: 1rem;
+    letter-spacing: 0.08em;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.92);
+}
+
+.city {
+    font-size: 1.4rem;
+    text-align: center;
+    margin-bottom: 0.55rem;
+}
+
+.temp {
+    font-size: clamp(2rem, 8vw, 3.2rem);
+    text-align: center;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+}
+
+.flex {
+    gap: 0.75rem;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.85rem;
+}
+
+.icon {
+    width: 75px;
+    height: 75px;
+    filter: drop-shadow(0 5px 8px rgba(0,0,0,0.35));
+}
+
+.description {
+    text-transform: capitalize;
+    font-size: 1.1rem;
+    opacity: 0.97;
+}
+
+.status-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+    margin-top: 1rem;
+}
+
+.status-card {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 0.65rem;
+    padding: 0.7rem;
+    text-align: center;
+}
+
+.status-card p {
+    margin: 0.2rem 0 0;
+    font-size: 0.92rem;
+    color: #d9e7ff;
+}
+
+.status-value {
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+footer {
+    margin-top: 1rem;
+    font-size: 0.82rem;
+    text-align: center;
+    opacity: 0.76;
+}
+
+@media (max-width: 480px) {
+    .card {
+        padding: 1rem;
+        border-radius: 20px;
+    }
+
+    .status-row {
+        grid-template-columns: 1fr;
+    }
+}
