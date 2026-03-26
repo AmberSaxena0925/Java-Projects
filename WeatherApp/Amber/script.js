@@ -1,5 +1,4 @@
 let weather = {
-    "apikey": "466ddaa21a8de191e9f608bd11a56acb",
     chart: null,
     fetchWeather: function(city){
         if (!city || city.trim() === "") {
@@ -10,25 +9,14 @@ let weather = {
         this.setStatus('Loading weather...');
         document.querySelector('.weather').classList.add('loading');
 
-        fetch(
-        "https://api.openweathermap.org/data/2.5/weather?q="
-        + encodeURIComponent(city.trim()) 
-        + "&units=metric&appid=" 
-        + this.apikey
-        )
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error('City not found');
-            }
-            return response.json();
-        })
+        getWeatherByCityName(city)
         .then((data) => {
             this.displayWeather(data);
             this.fetchForecast(city.trim());
         })
         .catch((err) => {
             console.error(err);
-            this.setStatus('Unable to fetch weather for "' + city + '".');
+            this.setStatus('Unable to fetch weather for "' + city + '". ' + err.message);
             document.querySelector('.weather').classList.remove('loading');
         });
     },
@@ -40,7 +28,7 @@ let weather = {
         const{ speed } = data.wind;
         // console.log(name,icon,description,temp,humidity,speed);
         document.querySelector(".city").innerText = "Weather in " + name;
-        document.querySelector(".icon").src = "https://openweathermap.org/img/wn/"+ icon +".png";
+        document.querySelector(".icon").src = getWeatherIconUrl(icon);
         document.querySelector(".description").innerText = description;
         document.querySelector(".temp").innerText = temp +"°C";
         document.querySelector(".status-value.humidity").innerText = humidity + "%";
@@ -50,13 +38,7 @@ let weather = {
     },
 
     fetchForecast: function(city){
-        fetch(
-        "https://api.openweathermap.org/data/2.5/forecast?q="
-        + encodeURIComponent(city) 
-        + "&units=metric&appid=" 
-        + this.apikey
-        )
-        .then((response) => response.json())
+        getWeatherForecast(city)
         .then((data) => this.renderChart(data))
         .catch((err) => console.error('Forecast fetch error:', err));
     },
@@ -137,52 +119,25 @@ let weather = {
 
 let geocode = {
     reverseGeocode: function (latitude ,longitude) {
-        var api_key = '089943fd115440dbb4d95b091479e834';
-
-  var api_url = 'https://api.opencagedata.com/geocode/v1/json'
-
-  var request_url = api_url
-    + '?'
-    + 'key=' + api_key
-    + '&q=' + encodeURIComponent(latitude + ',' + longitude)
-    + '&pretty=1'
-    + '&no_annotations=1';
-
-  // see full list of required and optional parameters:
-  // https://opencagedata.com/api#forward
-
-  var request = new XMLHttpRequest();
-  request.open('GET', request_url, true);
-
-  request.onload = function() {
-    // see full list of possible response codes:
-    // https://opencagedata.com/api#codes
-
-    if (request.status === 200){
-      // Success!
-      var data = JSON.parse(request.responseText);
-      weather.fetchWeather(data.results[0].components.city);
-
-    } else if (request.status <= 500){
-      // We reached our target server, but it returned an error
-
-      console.log("unable to geocode! Response code: " + request.status);
-      var data = JSON.parse(request.responseText);
-      console.log('error msg: ' + data.status.message);
-    } else {
-      console.log("server error");
-    }
-  };
-
-  request.onerror = function() {
-    // There was a connection error of some sort
-    console.log("unable to connect to server");
-  };
-
-  request.send();  // make the request
+        reverseGeocodeCoordinates(latitude, longitude)
+        .then((data) => {
+            if (data.results && data.results.length > 0) {
+                const components = data.results[0].components;
+                const city = components.city || components.town || components.village || 'Denver';
+                weather.fetchWeather(city);
+            } else {
+                throw new Error('No location found');
+            }
+        })
+        .catch((err) => {
+            console.error('Geocoding error:', err);
+            weather.setStatus('Unable to geocode location. Showing weather for Denver.');
+            weather.fetchWeather('Denver');
+        });
     },
 
     getLocation: function(){
+        weather.setStatus('Detecting your location...');
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 function (position) {
@@ -190,6 +145,7 @@ let geocode = {
                 },
                 function (error) {
                     console.error('Geolocation error:', error);
+                    weather.setStatus('Location access denied or unavailable. Showing weather for Denver.');
                     weather.fetchWeather('Denver');
                 },
                 {
@@ -199,6 +155,7 @@ let geocode = {
                 }
             );
         } else {
+            weather.setStatus('Geolocation not supported. Showing weather for Denver.');
             weather.fetchWeather('Denver');
         }
     }
